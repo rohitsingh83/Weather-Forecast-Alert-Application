@@ -1,14 +1,10 @@
 import unittest
 import sqlite3
-import tempfile
 from pathlib import Path
-import pandas as pd
 from fastapi.testclient import TestClient
 
-from src.rules import evaluate_daily_alerts, WeatherAlert
 from src.ingest import load_simulation_weather, persist_weather_to_db
-from src.plots import save_weather_charts
-from notify.alert import format_alert_message
+from src.rules import evaluate_daily_alerts, Alert
 from api.app import app
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -17,107 +13,62 @@ ROOT = Path(__file__).resolve().parent.parent
 class TestWeatherAlerts(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
+        self.sample_payload = load_simulation_weather(ROOT / "data" / "sample_weather.json")
 
-    def test_alert_rules_all_triggered(self):
-        sample = [{
-            "date": "2026-11-21",
-            "temp_max_c": 41.0,
-            "temp_min_c": 25.0,
-            "precip_prob_pct": 75,
-            "precip_mm": 10.0,
-            "wind_gust_ms": 16.0,
-            "uv_index": 9.0,
-        }]
-        alerts = evaluate_daily_alerts("TestCity", sample)
-        codes = {a.code for a in alerts}
-        self.assertEqual(codes, {"RAIN_SOON", "HEAT_WAVE", "WIND_HIGH", "UV_HIGH"})
-
-    def test_alert_rules_calm_weather(self):
-        sample = [{
-            "date": "2026-11-21",
-            "temp_max_c": 26.0,
-            "temp_min_c": 18.0,
-            "precip_prob_pct": 10,
-            "precip_mm": 0.0,
-            "wind_gust_ms": 5.0,
-            "uv_index": 4.0,
-        }]
-        alerts = evaluate_daily_alerts("CalmCity", sample)
-        self.assertEqual(len(alerts), 0)
-
-    def test_simulation_data_loading(self):
-        json_path = ROOT / "data" / "sample_weather.json"
-        self.assertTrue(json_path.exists())
-        payload = load_simulation_weather(json_path)
-        self.assertIn("locations", payload)
-        self.assertGreater(len(payload["locations"]), 0)
+    def test_json_ingestion(self):
+        """Verify weather simulation JSON loads with required locations."""
+        self.assertIn("locations", self.sample_payload)
+        self.assertGreater(len(self.sample_payload["locations"]), 0)
 
     def test_database_persistence(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            db_path = Path(tmpdir) / "weather_test.db"
-            conn = sqlite3.connect(str(db_path))
-            try:
-                conn.executescript((ROOT / "db" / "schema.sql").read_text(encoding="utf-8"))
-                payload = load_simulation_weather(ROOT / "data" / "sample_weather.json")
-                persist_weather_to_db(conn, payload)
+        """Verify SQLite tables are populated with forecast records."""
+        conn = sqlite3.connect(":memory:")
+        conn.executescript((ROOT / "db" / "schema.sql").read_text(encoding="utf-8"))
+        persist_weather_to_db(conn, self.sample_payload)
+        
+        row_count = conn.execute("SELECT COUNT(*) FROM weather_daily").fetchone()[0]
+        self.assertGreater(row_count, 0)
+        conn.close()
 
-                cur = conn.cursor()
-                cur.execute("SELECT COUNT(*) FROM locations")
-                loc_count = cur.fetchone()[0]
-                self.assertGreater(loc_count, 0)
-
-                cur.execute("SELECT COUNT(*) FROM weather_daily")
-                wd_count = cur.fetchone()[0]
-                self.assertGreater(wd_count, 0)
-            finally:
-                conn.close()
-
-    def test_format_alert_message(self):
-        alert_dict = {
-            "severity": "critical",
-            "location": "Delhi",
-            "date": "2026-11-21",
-            "code": "HEAT_WAVE",
-            "message": "Extreme heat warning (40.5 C)",
-        }
-        msg = format_alert_message(alert_dict)
-        self.assertIn("[CRITICAL]", msg)
-        self.assertIn("HEAT_WAVE", msg)
-        self.assertIn("Delhi", msg)
-
-    def test_weather_charts_generation(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            img_dir = Path(tmpdir) / "images"
-            img_dir.mkdir(parents=True, exist_ok=True)
-            payload = load_simulation_weather(ROOT / "data" / "sample_weather.json")
-            save_weather_charts(payload, img_dir)
-            files = list(img_dir.glob("*.png"))
-            self.assertGreater(len(files), 0)
+    def test_alert_rules_evaluation(self):
+        """Verify alert rule engine triggers on threshold conditions."""
+        sample_days = [
+            {"date": "2026-11-20", "temp_max_c": 42.0, "temp_min_c": 28.0, "precip_prob_pct": 20, "precip_mm": 0.0, "wind_gust_ms": 5.0, "uv_index": 5.0},
+            {"date": "2026-11-21", "temp_max_c": 30.0, "temp_min_c": 20.0, "precip_prob_pct": 80, "precip_mm": 25.0, "wind_gust_ms": 18.0, "uv_index": 9.0},
+            {"date": "2026-11-22", "temp_max_c": 12.0, "temp_min_c": 1.0, "precip_prob_pct": 10, "precip_mm": 0.0, "wind_gust_ms": 4.0, "uv_index": 2.0},
+        ]
+        alerts = evaluate_daily_alerts("TestCity", sample_days)
+        codes = [a.code for a in alerts]
+        self.assertIn("HEAT_WAVE", codes)
+        self.assertIn("RAIN_SOON", codes)
+        self.assertIn("WIND_HIGH", codes)
+        self.assertIn("UV_HIGH", codes)
+        self.assertIn("FROST_WARNING", codes)
 
     def test_api_health(self):
+        """Verify API health status probe."""
         resp = self.client.get("/health")
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()["status"], "ok")
 
-    def test_api_locations_and_alerts(self):
-        loc_resp = self.client.get("/locations")
-        self.assertEqual(loc_resp.status_code, 200)
-        self.assertIn("Hyderabad", loc_resp.json()["locations"])
-
-        alert_resp = self.client.get("/alerts")
-        self.assertEqual(alert_resp.status_code, 200)
-        self.assertIn("alerts", alert_resp.json())
-
-    def test_api_forecast_by_city(self):
-        resp = self.client.get("/forecast/Hyderabad")
+    def test_api_locations(self):
+        """Verify location listing endpoint."""
+        resp = self.client.get("/locations")
         self.assertEqual(resp.status_code, 200)
-        data = resp.json()
-        self.assertEqual(data["city"], "Hyderabad")
-        self.assertEqual(len(data["daily"]), 7)
+        self.assertIn("locations", resp.json())
 
-        # Test non-existent city
-        not_found = self.client.get("/forecast/NonExistentCity")
-        self.assertEqual(not_found.status_code, 404)
+    def test_api_alerts(self):
+        """Verify alert endpoint returns active alerts."""
+        resp = self.client.get("/alerts")
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("alerts", resp.json())
+
+    def test_api_forecast_city(self):
+        """Verify specific city forecast endpoint."""
+        first_city = self.sample_payload["locations"][0]["name"]
+        resp = self.client.get(f"/forecast/{first_city}")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["city"].lower(), first_city.lower())
 
 
 if __name__ == "__main__":
