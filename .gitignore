@@ -4,7 +4,5 @@ venv/
 .venv/
 .env
 db/*.db
-outputs/*.csv
-images/*.png
 reports/*
 .DS_Store
