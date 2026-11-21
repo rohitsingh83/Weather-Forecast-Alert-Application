@@ -1,0 +1,16 @@
+city,start,end,rule_id,name,severity,value,threshold,message,advice
+Delhi,2026-11-21,2026-11-25,AQI_SEVERE,Hazardous air,critical,422.0,301.0,Hazardous air in Delhi from Sat 21 to Wed 25 Nov (5 days): peak 422 AQI (limit 301 AQI),Stay indoors with windows closed; use an air purifier if possible.
+Delhi,2026-11-24,2026-11-26,COLD,Cold wave,warning,6.9,8.0,Cold wave in Delhi from Tue 24 to Thu 26 Nov (3 days): lowest 6.9°C (limit 8°C),Wear warm layers; protect children and the elderly at night.
+Delhi,2026-11-24,2026-11-25,FOG,Dense fog,warning,251.0,500.0,Dense fog in Delhi from Tue 24 to Wed 25 Nov (2 days): lowest 251 m (limit 500 m),Drive slowly with low-beam lights; expect flight and train delays.
+Delhi,2026-11-26,2026-11-27,AQI_POOR,Unhealthy air,warning,286.0,151.0,Unhealthy air in Delhi from Thu 26 to Fri 27 Nov (2 days): peak 286 AQI (limit 151 AQI),Limit outdoor exercise; wear an N95 mask outside.
+Mumbai,2026-11-21,2026-11-27,AQI_POOR,Unhealthy air,warning,211.0,151.0,Unhealthy air in Mumbai from Sat 21 to Fri 27 Nov (7 days): peak 211 AQI (limit 151 AQI),Limit outdoor exercise; wear an N95 mask outside.
+Mumbai,2026-11-23,2026-11-24,HOT,Very hot day,warning,36.4,36.0,Very hot day in Mumbai from Mon 23 to Tue 24 Nov (2 days): peak 36.4°C (limit 36°C),Avoid outdoor work in the afternoon and stay hydrated.
+Mumbai,2026-11-21,2026-11-27,UV,Very high UV,info,9.0,8.0,Very high UV in Mumbai from Sat 21 to Fri 27 Nov (7 days): peak 9 (limit 8),Use sunscreen and avoid direct sun around noon.
+Bengaluru,2026-11-22,2026-11-23,RAIN,Rain likely,info,93.0,70.0,Rain likely in Bengaluru from Sun 22 to Mon 23 Nov (2 days): peak 93% (limit 70%),Carry an umbrella.
+Bengaluru,2026-11-25,2026-11-26,UV,Very high UV,info,8.0,8.0,Very high UV in Bengaluru from Wed 25 to Thu 26 Nov (2 days): peak 8 (limit 8),Use sunscreen and avoid direct sun around noon.
+Chennai,2026-11-23,2026-11-24,HEAVY_RAIN,Heavy rain,critical,118.0,64.5,Heavy rain in Chennai from Mon 23 to Tue 24 Nov (2 days): peak 118 mm (limit 64.5 mm),Expect waterlogging; avoid low-lying roads and plan travel early.
+Chennai,2026-11-23,2026-11-24,WIND,Strong winds,warning,71.4,50.0,Strong winds in Chennai from Mon 23 to Tue 24 Nov (2 days): peak 71.4 km/h (limit 50 km/h),Secure loose objects; be careful with two-wheelers.
+Chennai,2026-11-21,2026-11-22,RAIN,Rain likely,info,100.0,70.0,Rain likely in Chennai from Sat 21 to Sun 22 Nov (2 days): peak 100% (limit 70%),Carry an umbrella.
+Chennai,2026-11-25,2026-11-25,RAIN,Rain likely,info,93.0,70.0,Rain likely in Chennai on Wed 25 Nov: peak 93% (limit 70%),Carry an umbrella.
+Chennai,2026-11-27,2026-11-27,UV,Very high UV,info,8.0,8.0,Very high UV in Chennai on Fri 27 Nov: peak 8 (limit 8),Use sunscreen and avoid direct sun around noon.
+Kolkata,2026-11-21,2026-11-27,AQI_POOR,Unhealthy air,warning,242.0,151.0,Unhealthy air in Kolkata from Sat 21 to Fri 27 Nov (7 days): peak 242 AQI (limit 151 AQI),Limit outdoor exercise; wear an N95 mask outside.
