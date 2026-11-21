@@ -1,0 +1,12 @@
+[
+  {"id": "HEAT", "name": "Heat wave", "metric": "temperature_2m_max", "level": "daily", "operator": ">=", "threshold": 40, "severity": "critical", "advice": "Stay indoors 12-4 pm, drink water, check on elderly people."},
+  {"id": "HOT", "name": "Very hot day", "metric": "temperature_2m_max", "level": "daily", "operator": ">=", "threshold": 36, "severity": "warning", "advice": "Avoid outdoor work in the afternoon and stay hydrated."},
+  {"id": "COLD", "name": "Cold wave", "metric": "temperature_2m_min", "level": "daily", "operator": "<=", "threshold": 8, "severity": "warning", "advice": "Wear warm layers; protect children and the elderly at night."},
+  {"id": "HEAVY_RAIN", "name": "Heavy rain", "metric": "precipitation_sum", "level": "daily", "operator": ">=", "threshold": 64.5, "severity": "critical", "advice": "Expect waterlogging; avoid low-lying roads and plan travel early."},
+  {"id": "RAIN", "name": "Rain likely", "metric": "precipitation_probability_max", "level": "daily", "operator": ">=", "threshold": 70, "severity": "info", "advice": "Carry an umbrella."},
+  {"id": "WIND", "name": "Strong winds", "metric": "wind_gusts_10m_max", "level": "daily", "operator": ">=", "threshold": 50, "severity": "warning", "advice": "Secure loose objects; be careful with two-wheelers."},
+  {"id": "UV", "name": "Very high UV", "metric": "uv_index_max", "level": "daily", "operator": ">=", "threshold": 8, "severity": "info", "advice": "Use sunscreen and avoid direct sun around noon."},
+  {"id": "AQI_POOR", "name": "Unhealthy air", "metric": "us_aqi_max", "level": "daily", "operator": ">=", "threshold": 151, "severity": "warning", "advice": "Limit outdoor exercise; wear an N95 mask outside."},
+  {"id": "AQI_SEVERE", "name": "Hazardous air", "metric": "us_aqi_max", "level": "daily", "operator": ">=", "threshold": 301, "severity": "critical", "advice": "Stay indoors with windows closed; use an air purifier if possible."},
+  {"id": "FOG", "name": "Dense fog", "metric": "visibility_min", "level": "daily", "operator": "<=", "threshold": 500, "severity": "warning", "advice": "Drive slowly with low-beam lights; expect flight and train delays."}
+]
