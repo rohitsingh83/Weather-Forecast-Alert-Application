@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather Forecast &amp; Alert Application</title>
+<meta name="description" content="Hourly and 7-day forecasts with air quality, plus early warnings for heat, rain, wind, fog and toxic air, each with practical advice.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="assets/plotly.min.js"></script>
+<style>
+:root{--a:#38BDF8;--bg:#0B1120;--card:#111a2e;--line:#1f2a44;--t:#e2e8f0;--m:#94a3b8}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--t);font-family:Inter,system-ui,sans-serif;line-height:1.55}
+header{padding:56px 24px 36px;background:radial-gradient(circle at 80% 0,color-mix(in srgb,var(--a) 35%,transparent),transparent 55%),linear-gradient(160deg,#0f172a,#0b1120);border-bottom:1px solid var(--line)}
+.wrap{max-width:1180px;margin:0 auto} .tag{color:var(--a);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px}
+h1{font-size:clamp(30px,5vw,52px);margin:.2em 0 .25em;letter-spacing:-.02em} .sub{color:#cbd5e1;font-size:18px;max-width:820px}
+.btns{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap} .btns a{padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px}
+.p{background:var(--a);color:#0b1120} .s{border:1px solid var(--line);color:var(--t)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:30px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px} .kpi .v{font-size:26px;font-weight:800;color:var(--a)} .kpi .l{color:var(--m);font-size:13px}
+nav{position:sticky;top:0;background:rgba(11,17,32,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);z-index:5}
+nav .wrap{display:flex;gap:18px;overflow-x:auto;padding:12px 24px} nav a{color:var(--m);text-decoration:none;font-size:14px;white-space:nowrap} nav a:hover{color:var(--a)}
+main .wrap{padding:10px 24px 60px} section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:22px}
+h2{margin:0 0 4px;font-size:22px} .d{color:var(--m);margin:0 0 12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:14px} .grid2>div{min-width:0;overflow:hidden}
+.tbl{width:100%;border-collapse:collapse;font-size:13px} .tbl th{text-align:left;color:var(--m);border-bottom:1px solid var(--line);padding:8px} .tbl td{border-bottom:1px solid var(--line);padding:8px}
+.scroll{overflow-x:auto} .note{background:#422006;color:#fde68a;border-radius:10px;padding:10px 14px;margin-top:18px;font-size:14px}
+.list li{margin:6px 0} code{display:block;background:#0b1120;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;color:#a5f3fc;font-size:13px}
+footer{color:var(--m);text-align:center;font-size:13px;padding:30px}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}}
+</style></head><body>
+<header><div class="wrap"><div class="tag">Python Project · Live Report</div><h1>Weather Forecast &amp; Alert Application</h1><div class="sub">Hourly and 7-day forecasts with air quality, plus early warnings for heat, rain, wind, fog and toxic air, each with practical advice.</div>
+<div class="btns"><a class="p" href="https://github.com/rohitsingh83/Weather-Forecast-Alert-Application">View source on GitHub</a><a class="s" href="https://github.com/rohitsingh83/Weather-Forecast-Alert-Application#how-to-run">Run it locally</a></div>
+<div class="kpis"><div class="kpi"><div class="v">6</div><div class="l">Cities monitored</div></div><div class="kpi"><div class="v">10</div><div class="l">Alert rules</div></div><div class="kpi"><div class="v">15</div><div class="l">Active alerts</div></div><div class="kpi"><div class="v">2</div><div class="l">Critical alerts</div></div><div class="kpi"><div class="v">12</div><div class="l">Automated tests</div></div></div><div class="note">Forecasts on this page are SIMULATED sample data for 21–27 Nov 2026, bundled for offline use. Run the app on your computer for the live Open-Meteo forecast.</div></div></header>
+<nav><div class="wrap"><a href="#s0">Active alerts</a><a href="#s1">City comparison</a><a href="#s2">Hourly forecast</a><a href="#s3">Air quality</a><a href="#s4">Alert rules</a></div></nav>
+<main><div class="wrap"><section id="s0"><h2>Active alerts</h2><p class="d">Most severe alert per hazard; consecutive days merged into one warning.</p><div class="scroll"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th>City</th>
+      <th>Severity</th>
+      <th>Alert</th>
+      <th>Advice</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Delhi</td>
+      <td>CRITICAL</td>
+      <td>Hazardous air in Delhi from Sat 21 to Wed 25 Nov (5 days): peak 422 AQI (limit 301 AQI)</td>
+      <td>Stay indoors with windows closed; use an air purifier if possible.</td>
+    </tr>
+    <tr>
+      <td>Delhi</td>
+      <td>WARNING</td>
+      <td>Cold wave in Delhi from Tue 24 to Thu 26 Nov (3 days): lowest 6.9°C (limit 8°C)</td>
+      <td>Wear warm layers; protect children and the elderly at night.</td>
+    </tr>
+    <tr>
+      <td>Delhi</td>
+      <td>WARNING</td>
+      <td>Dense fog in Delhi from Tue 24 to Wed 25 Nov (2 days): lowest 251 m (limit 500 m)</td>
+      <td>Drive slowly with low-beam lights; expect flight and train delays.</td>
+    </tr>
+    <tr>
+      <td>Delhi</td>
+      <td>WARNING</td>
+      <td>Unhealthy air in Delhi from Thu 26 to Fri 27 Nov (2 days): peak 286 AQI (limit 151 AQI)</td>
+      <td>Limit outdoor exercise; wear an N95 mask outside.</td>
+    </tr>
+    <tr>
+      <td>Mumbai</td>
+      <td>WARNING</td>
+      <td>Unhealthy air in Mumbai from Sat 21 to Fri 27 Nov (7 days): peak 211 AQI (limit 151 AQI)</td>
+      <td>Limit outdoor exercise; wear an N95 mask outside.</td>
+    </tr>
+    <tr>
+      <td>Mumbai</td>
+      <td>WARNING</td>
+      <td>Very hot day in Mumbai from Mon 23 to Tue 24 Nov (2 days): peak 36.4°C (limit 36°C)</td>
+      <td>Avoid outdoor work in the afternoon and stay hydrated.</td>
+    </tr>
+    <tr>
+      <td>Mumbai</td>
+      <td>INFO</td>
+      <td>Very high UV in Mumbai from Sat 21 to Fri 27 Nov (7 days): peak 9 (limit 8)</td>
+      <td>Use sunscreen and avoid direct sun around noon.</td>
+    </tr>
+    <tr>
+      <td>Bengaluru</td>
+      <td>INFO</td>
+      <td>Rain likely in Bengaluru from Sun 22 to Mon 23 Nov (2 days): peak 93% (limit 70%)</td>
+      <td>Carry an umbrella.</td>
+    </tr>
+    <tr>
+      <td>Bengaluru</td>
+      <td>INFO</td>
+      <td>Very high UV in Bengaluru from Wed 25 to Thu 26 Nov (2 days): peak 8 (limit 8)</td>
+      <td>Use sunscreen and avoid direct sun around noon.</td>
+    </tr>
+    <tr>
+      <td>Chennai</td>
+      <td>CRITICAL</td>
+      <td>Heavy rain in Chennai from Mon 23 to Tue 24 Nov (2 days): peak 118 mm (limit 64.5 mm)</td>
+      <td>Expect waterlogging; avoid low-lying roads and plan travel early.</td>
+    </tr>
+    <tr>
+      <td>Chennai</td>
+      <td>WARNING</td>
+      <td>Strong winds in Chennai from Mon 23 to Tue 24 Nov (2 days): peak 71.4 km/h (limit 50 km/h)</td>
+      <td>Secure loose objects; be careful with two-wheelers.</td>
+    </tr>
+    <tr>
+      <td>Chennai</td>
+      <td>INFO</td>
+      <td>Rain likely in Chennai from Sat 21 to Sun 22 Nov (2 days): peak 100% (limit 70%)</td>
+      <td>Carry an umbrella.</td>
+    </tr>
+    <tr>
+      <td>Chennai</td>
+      <td>INFO</td>
+      <td>Rain likely in Chennai on Wed 25 Nov: peak 93% (limit 70%)</td>
+      <td>Carry an umbrella.</td>
+    </tr>
+    <tr>
+      <td>Chennai</td>
+      <td>INFO</td>
+      <td>Very high UV in Chennai on Fri 27 Nov: peak 8 (limit 8)</td>
+      <td>Use sunscreen and avoid direct sun around noon.</td>
+    </tr>
+    <tr>
+      <td>Kolkata</td>
+      <td>WARNING</td>
+      <td>Unhealthy air in Kolkata from Sat 21 to Fri 27 Nov (7 days): peak 242 AQI (limit 151 AQI)</td>
+      <td>Limit outdoor exercise; wear an N95 mask outside.</td>
+    </tr>
+  </tbody>
+</table></div></section><section id="s1"><h2>City comparison</h2><p class="d">Next 7 days across six Indian cities.</p><div class="grid2"><div style="height:380px; width:100%;">                            <div id="7f61c1f8-bd6b-47ad-bdb2-9b251625cb86" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("7f61c1f8-bd6b-47ad-bdb2-9b251625cb86")) {                    Plotly.newPlot(                        "7f61c1f8-bd6b-47ad-bdb2-9b251625cb86",                        [{"alignmentgroup":"True","hovertemplate":"variable=Min \u00b0C\u003cbr\u003eCity=%{x}\u003cbr\u003evalue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Min \u00b0C","marker":{"color":"#38BDF8","pattern":{"shape":""}},"name":"Min \u00b0C","offsetgroup":"Min \u00b0C","orientation":"v","showlegend":true,"textposition":"auto","x":["Delhi","Mumbai","Bengaluru","Chennai","Kolkata","Hyderabad"],"xaxis":"x","y":{"dtype":"f8","bdata":"mpmZmZmZG0DNzMzMzMw2QAAAAAAAgDBAzczMzMzMNkDNzMzMzMwwQJqZmZmZmS9A"},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"variable=Max \u00b0C\u003cbr\u003eCity=%{x}\u003cbr\u003evalue=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Max \u00b0C","marker":{"color":"#F97316","pattern":{"shape":""}},"name":"Max \u00b0C","offsetgroup":"Max \u00b0C","orientation":"v","showlegend":true,"textposition":"auto","x":["Delhi","Mumbai","Bengaluru","Chennai","Kolkata","Hyderabad"],"xaxis":"x","y":{"dtype":"f8","bdata":"zczMzMxMOkAzMzMzMzNCQJqZmZmZmTxAAAAAAACAP0BmZmZmZmY9QM3MzMzMTD9A"},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"City"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"value"}},"legend":{"title":{"text":"variable"},"tracegroupgap":0},"title":{"text":"Temperature range by city"},"barmode":"group","margin":{"l":10,"r":10,"t":50,"b":10},"font":{"family":"Inter, sans-serif"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":380},                        {"displaylogo": false, "responsive": true}                    )                };            </script>        </div><div><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th>City</th>
+      <th>Max °C</th>
+      <th>Min °C</th>
+      <th>Rain mm (7d)</th>
+      <th>Peak AQI</th>
+      <th>AQI category</th>
+      <th>Alerts</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Delhi</td>
+      <td>26.3</td>
+      <td>6.9</td>
+      <td>0</td>
+      <td>422</td>
+      <td>Hazardous</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>Mumbai</td>
+      <td>36.4</td>
+      <td>22.8</td>
+      <td>0</td>
+      <td>211</td>
+      <td>Very unhealthy</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>Bengaluru</td>
+      <td>28.6</td>
+      <td>16.5</td>
+      <td>33</td>
+      <td>98</td>
+      <td>Moderate</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>Chennai</td>
+      <td>31.5</td>
+      <td>22.8</td>
+      <td>304</td>
+      <td>76</td>
+      <td>Moderate</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>Kolkata</td>
+      <td>29.4</td>
+      <td>16.8</td>
+      <td>0</td>
+      <td>242</td>
+      <td>Very unhealthy</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Hyderabad</td>
+      <td>31.3</td>
+      <td>15.8</td>
+      <td>6</td>
+      <td>150</td>
+      <td>Unhealthy for sensitive groups</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table></div></div></section><section id="s2"><h2>Hourly forecast</h2><p class="d">Chennai&#x27;s heavy-rain spell, hour by hour.</p><div style="height:420px; width:100%;">                            <div id="55162ab9-0d11-4329-bbee-3d32d81b63f2" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("55162ab9-0d11-4329-bbee-3d32d81b63f2")) {                    Plotly.newPlot(                        "55162ab9-0d11-4329-bbee-3d32d81b63f2",                        [{"marker":{"color":"#3B82F6"},"name":"Rain mm\u002fh","x":["2026-11-21T00:00:00.000000","2026-11-21T01:00:00.000000","2026-11-21T02:00:00.000000","2026-11-21T03:00:00.000000","2026-11-21T04:00:00.000000","2026-11-21T05:00:00.000000","2026-11-21T06:00:00.000000","2026-11-21T07:00:00.000000","2026-11-21T08:00:00.000000","2026-11-21T09:00:00.000000","2026-11-21T10:00:00.000000","2026-11-21T11:00:00.000000","2026-11-21T12:00:00.000000","2026-11-21T13:00:00.000000","2026-11-21T14:00:00.000000","2026-11-21T15:00:00.000000","2026-11-21T16:00:00.000000","2026-11-21T17:00:00.000000","2026-11-21T18:00:00.000000","2026-11-21T19:00:00.000000","2026-11-21T20:00:00.000000","2026-11-21T21:00:00.000000","2026-11-21T22:00:00.000000","2026-11-21T23:00:00.000000","2026-11-22T00:00:00.000000","2026-11-22T01:00:00.000000","2026-11-22T02:00:00.000000","2026-11-22T03:00:00.000000","2026-11-22T04:00:00.000000","2026-11-22T05:00:00.000000","2026-11-22T06:00:00.000000","2026-11-22T07:00:00.000000","2026-11-22T08:00:00.000000","2026-11-22T09:00:00.000000","2026-11-22T10:00:00.000000","2026-11-22T11:00:00.000000","2026-11-22T12:00:00.000000","2026-11-22T13:00:00.000000","2026-11-22T14:00:00.000000","2026-11-22T15:00:00.000000","2026-11-22T16:00:00.000000","2026-11-22T17:00:00.000000","2026-11-22T18:00:00.000000","2026-11-22T19:00:00.000000","2026-11-22T20:00:00.000000","2026-11-22T21:00:00.000000","2026-11-22T22:00:00.000000","2026-11-22T23:00:00.000000","2026-11-23T00:00:00.000000","2026-11-23T01:00:00.000000","2026-11-23T02:00:00.000000","2026-11-23T03:00:00.000000","2026-11-23T04:00:00.000000","2026-11-23T05:00:00.000000","2026-11-23T06:00:00.000000","2026-11-23T07:00:00.000000","2026-11-23T08:00:00.000000","2026-11-23T09:00:00.000000","2026-11-23T10:00:00.000000","2026-11-23T11:00:00.000000","2026-11-23T12:00:00.000000","2026-11-23T13:00:00.000000","2026-11-23T14:00:00.000000","2026-11-23T15:00:00.000000","2026-11-23T16:00:00.000000","2026-11-23T17:00:00.000000","2026-11-23T18:00:00.000000","2026-11-23T19:00:00.000000","2026-11-23T20:00:00.000000","2026-11-23T21:00:00.000000","2026-11-23T22:00:00.000000","2026-11-23T23:00:00.000000","2026-11-24T00:00:00.000000","2026-11-24T01:00:00.000000","2026-11-24T02:00:00.000000","2026-11-24T03:00:00.000000","2026-11-24T04:00:00.000000","2026-11-24T05:00:00.000000","2026-11-24T06:00:00.000000","2026-11-24T07:00:00.000000","2026-11-24T08:00:00.000000","2026-11-24T09:00:00.000000","2026-11-24T10:00:00.000000","2026-11-24T11:00:00.000000","2026-11-24T12:00:00.000000","2026-11-24T13:00:00.000000","2026-11-24T14:00:00.000000","2026-11-24T15:00:00.000000","2026-11-24T16:00:00.000000","2026-11-24T17:00:00.000000","2026-11-24T18:00:00.000000","2026-11-24T19:00:00.000000","2026-11-24T20:00:00.000000","2026-11-24T21:00:00.000000","2026-11-24T22:00:00.000000","2026-11-24T23:00:00.000000","2026-11-25T00:00:00.000000","2026-11-25T01:00:00.000000","2026-11-25T02:00:00.000000","2026-11-25T03:00:00.000000","2026-11-25T04:00:00.000000","2026-11-25T05:00:00.000000","2026-11-25T06:00:00.000000","2026-11-25T07:00:00.000000","2026-11-25T08:00:00.000000","2026-11-25T09:00:00.000000","2026-11-25T10:00:00.000000","2026-11-25T11:00:00.000000","2026-11-25T12:00:00.000000","2026-11-25T13:00:00.000000","2026-11-25T14:00:00.000000","2026-11-25T15:00:00.000000","2026-11-25T16:00:00.000000","2026-11-25T17:00:00.000000","2026-11-25T18:00:00.000000","2026-11-25T19:00:00.000000","2026-11-25T20:00:00.000000","2026-11-25T21:00:00.000000","2026-11-25T22:00:00.000000","2026-11-25T23:00:00.000000","2026-11-26T00:00:00.000000","2026-11-26T01:00:00.000000","2026-11-26T02:00:00.000000","2026-11-26T03:00:00.000000","2026-11-26T04:00:00.000000","2026-11-26T05:00:00.000000","2026-11-26T06:00:00.000000","2026-11-26T07:00:00.000000","2026-11-26T08:00:00.000000","2026-11-26T09:00:00.000000","2026-11-26T10:00:00.000000","2026-11-26T11:00:00.000000","2026-11-26T12:00:00.000000","2026-11-26T13:00:00.000000","2026-11-26T14:00:00.000000","2026-11-26T15:00:00.000000","2026-11-26T16:00:00.000000","2026-11-26T17:00:00.000000","2026-11-26T18:00:00.000000","2026-11-26T19:00:00.000000","2026-11-26T20:00:00.000000","2026-11-26T21:00:00.000000","2026-11-26T22:00:00.000000","2026-11-26T23:00:00.000000","2026-11-27T00:00:00.000000","2026-11-27T01:00:00.000000","2026-11-27T02:00:00.000000","2026-11-27T03:00:00.000000","2026-11-27T04:00:00.000000","2026-11-27T05:00:00.000000","2026-11-27T06:00:00.000000","2026-11-27T07:00:00.000000","2026-11-27T08:00:00.000000","2026-11-27T09:00:00.000000","2026-11-27T10:00:00.000000","2026-11-27T11:00:00.000000","2026-11-27T12:00:00.000000","2026-11-27T13:00:00.000000","2026-11-27T14:00:00.000000","2026-11-27T15:00:00.000000","2026-11-27T16:00:00.000000","2026-11-27T17:00:00.000000","2026-11-27T18:00:00.000000","2026-11-27T19:00:00.000000","2026-11-27T20:00:00.000000","2026-11-27T21:00:00.000000","2026-11-27T22:00:00.000000","2026-11-27T23:00:00.000000"],"y":{"dtype":"f8","bdata":"mpmZmZmZuT+amZmZmZm5P5qZmZmZmbk\u002fmpmZmZmZuT+amZmZmZm5P5qZmZmZmbk\u002fmpmZmZmZuT+amZmZmZm5P5qZmZmZmck\u002fmpmZmZmZuT+amZmZmZm5PzMzMzMzM9M\u002fAAAAAAAA4D8zMzMzMzPzPzMzMzMzM\u002fM\u002fMzMzMzMz8z\u002fNzMzMzMzsP83MzMzMzOw\u002fzczMzMzM7D\u002fNzMzMzMzsP5qZmZmZmfE\u002fzczMzMzM7D+amZmZmZnZPzMzMzMzM9M\u002fMzMzMzMz4z8zMzMzMzPjPwAAAAAAAOA\u002fMzMzMzMz4z+amZmZmZnZP5qZmZmZmdk\u002fAAAAAAAA4D+amZmZmZnZPwAAAAAAAOA\u002fMzMzMzMz4z+amZmZmZnZPzMzMzMzM\u002fs\u002fMzMzMzMz8z+amZmZmZkRQGZmZmZmZgpAZmZmZmZmDkCamZmZmZkNQDMzMzMzMwdAzczMzMzMEEAzMzMzMzMHQM3MzMzMzBBAMzMzMzMzD0DNzMzMzMz8P2ZmZmZmZvY\u002fzczMzMzM9D8zMzMzMzPzPzMzMzMzM\u002fM\u002fAAAAAAAA8D+amZmZmZnpP5qZmZmZmek\u002fmpmZmZmZ6T\u002fNzMzMzMz0P5qZmZmZmek\u002fAAAAAAAA8D+amZmZmZnxP83MzMzMzAxAzczMzMzMCECamZmZmZkhQGZmZmZmZh5AZmZmZmZmI0DNzMzMzMwYQAAAAAAAABpAzczMzMzMHEBmZmZmZmYhQM3MzMzMzBxAZmZmZmZmGECamZmZmZkNQGZmZmZmZgJAmpmZmZmZ+T+amZmZmZnxP2ZmZmZmZvY\u002fZmZmZmZm9j8AAAAAAADwP2ZmZmZmZvY\u002fmpmZmZmZ8T8zMzMzMzPzP5qZmZmZmfE\u002fmpmZmZmZ8T9mZmZmZmb2PzMzMzMzMwdAAAAAAAAAEECamZmZmZkmQM3MzMzMzCdAmpmZmZmZIUAAAAAAAAAeQJqZmZmZmSVAAAAAAAAAHkCamZmZmZkpQM3MzMzMzBxAZmZmZmZmKEBmZmZmZmYOQJqZmZmZmQ1AmpmZmZmZyT+amZmZmZnZPzMzMzMzM9M\u002fmpmZmZmZ2T+amZmZmZnZPzMzMzMzM9M\u002fmpmZmZmZ2T+amZmZmZnJP5qZmZmZmdk\u002fmpmZmZmZ2T+amZmZmZnJP83MzMzMzOw\u002fmpmZmZmZ8T8AAAAAAAAEQDMzMzMzMwdAzczMzMzMAEDNzMzMzMwEQGZmZmZmZv4\u002fAAAAAAAACECamZmZmZkFQDMzMzMzMwNAmpmZmZmZBUCamZmZmZnxP2ZmZmZmZuY\u002fmpmZmZmZuT+amZmZmZm5P5qZmZmZmbk\u002fmpmZmZmZuT+amZmZmZm5P5qZmZmZmbk\u002fmpmZmZmZuT+amZmZmZm5P5qZmZmZmbk\u002fmpmZmZmZuT+amZmZmZm5P5qZmZmZmck\u002fmpmZmZmZuT8AAAAAAADgP5qZmZmZmdk\u002fmpmZmZmZ2T8zMzMzMzPTP5qZmZmZmdk\u002fmpmZmZmZ2T8AAAAAAADgPwAAAAAAAOA\u002fmpmZmZmZ2T+amZmZmZm5P5qZmZmZmck\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJqZmZmZmbk\u002fmpmZmZmZuT+amZmZmZnJP5qZmZmZmck\u002fmpmZmZmZuT+amZmZmZnJP5qZmZmZmck\u002fmpmZmZmZyT+amZmZmZm5P5qZmZmZmbk\u002fmpmZmZmZyT+amZmZmZm5P5qZmZmZmbk\u002f"},"type":"bar"},{"line":{"color":"#F97316"},"name":"Temperature \u00b0C","x":["2026-11-21T00:00:00.000000","2026-11-21T01:00:00.000000","2026-11-21T02:00:00.000000","2026-11-21T03:00:00.000000","2026-11-21T04:00:00.000000","2026-11-21T05:00:00.000000","2026-11-21T06:00:00.000000","2026-11-21T07:00:00.000000","2026-11-21T08:00:00.000000","2026-11-21T09:00:00.000000","2026-11-21T10:00:00.000000","2026-11-21T11:00:00.000000","2026-11-21T12:00:00.000000","2026-11-21T13:00:00.000000","2026-11-21T14:00:00.000000","2026-11-21T15:00:00.000000","2026-11-21T16:00:00.000000","2026-11-21T17:00:00.000000","2026-11-21T18:00:00.000000","2026-11-21T19:00:00.000000","2026-11-21T20:00:00.000000","2026-11-21T21:00:00.000000","2026-11-21T22:00:00.000000","2026-11-21T23:00:00.000000","2026-11-22T00:00:00.000000","2026-11-22T01:00:00.000000","2026-11-22T02:00:00.000000","2026-11-22T03:00:00.000000","2026-11-22T04:00:00.000000","2026-11-22T05:00:00.000000","2026-11-22T06:00:00.000000","2026-11-22T07:00:00.000000","2026-11-22T08:00:00.000000","2026-11-22T09:00:00.000000","2026-11-22T10:00:00.000000","2026-11-22T11:00:00.000000","2026-11-22T12:00:00.000000","2026-11-22T13:00:00.000000","2026-11-22T14:00:00.000000","2026-11-22T15:00:00.000000","2026-11-22T16:00:00.000000","2026-11-22T17:00:00.000000","2026-11-22T18:00:00.000000","2026-11-22T19:00:00.000000","2026-11-22T20:00:00.000000","2026-11-22T21:00:00.000000","2026-11-22T22:00:00.000000","2026-11-22T23:00:00.000000","2026-11-23T00:00:00.000000","2026-11-23T01:00:00.000000","2026-11-23T02:00:00.000000","2026-11-23T03:00:00.000000","2026-11-23T04:00:00.000000","2026-11-23T05:00:00.000000","2026-11-23T06:00:00.000000","2026-11-23T07:00:00.000000","2026-11-23T08:00:00.000000","2026-11-23T09:00:00.000000","2026-11-23T10:00:00.000000","2026-11-23T11:00:00.000000","2026-11-23T12:00:00.000000","2026-11-23T13:00:00.000000","2026-11-23T14:00:00.000000","2026-11-23T15:00:00.000000","2026-11-23T16:00:00.000000","2026-11-23T17:00:00.000000","2026-11-23T18:00:00.000000","2026-11-23T19:00:00.000000","2026-11-23T20:00:00.000000","2026-11-23T21:00:00.000000","2026-11-23T22:00:00.000000","2026-11-23T23:00:00.000000","2026-11-24T00:00:00.000000","2026-11-24T01:00:00.000000","2026-11-24T02:00:00.000000","2026-11-24T03:00:00.000000","2026-11-24T04:00:00.000000","2026-11-24T05:00:00.000000","2026-11-24T06:00:00.000000","2026-11-24T07:00:00.000000","2026-11-24T08:00:00.000000","2026-11-24T09:00:00.000000","2026-11-24T10:00:00.000000","2026-11-24T11:00:00.000000","2026-11-24T12:00:00.000000","2026-11-24T13:00:00.000000","2026-11-24T14:00:00.000000","2026-11-24T15:00:00.000000","2026-11-24T16:00:00.000000","2026-11-24T17:00:00.000000","2026-11-24T18:00:00.000000","2026-11-24T19:00:00.000000","2026-11-24T20:00:00.000000","2026-11-24T21:00:00.000000","2026-11-24T22:00:00.000000","2026-11-24T23:00:00.000000","2026-11-25T00:00:00.000000","2026-11-25T01:00:00.000000","2026-11-25T02:00:00.000000","2026-11-25T03:00:00.000000","2026-11-25T04:00:00.000000","2026-11-25T05:00:00.000000","2026-11-25T06:00:00.000000","2026-11-25T07:00:00.000000","2026-11-25T08:00:00.000000","2026-11-25T09:00:00.000000","2026-11-25T10:00:00.000000","2026-11-25T11:00:00.000000","2026-11-25T12:00:00.000000","2026-11-25T13:00:00.000000","2026-11-25T14:00:00.000000","2026-11-25T15:00:00.000000","2026-11-25T16:00:00.000000","2026-11-25T17:00:00.000000","2026-11-25T18:00:00.000000","2026-11-25T19:00:00.000000","2026-11-25T20:00:00.000000","2026-11-25T21:00:00.000000","2026-11-25T22:00:00.000000","2026-11-25T23:00:00.000000","2026-11-26T00:00:00.000000","2026-11-26T01:00:00.000000","2026-11-26T02:00:00.000000","2026-11-26T03:00:00.000000","2026-11-26T04:00:00.000000","2026-11-26T05:00:00.000000","2026-11-26T06:00:00.000000","2026-11-26T07:00:00.000000","2026-11-26T08:00:00.000000","2026-11-26T09:00:00.000000","2026-11-26T10:00:00.000000","2026-11-26T11:00:00.000000","2026-11-26T12:00:00.000000","2026-11-26T13:00:00.000000","2026-11-26T14:00:00.000000","2026-11-26T15:00:00.000000","2026-11-26T16:00:00.000000","2026-11-26T17:00:00.000000","2026-11-26T18:00:00.000000","2026-11-26T19:00:00.000000","2026-11-26T20:00:00.000000","2026-11-26T21:00:00.000000","2026-11-26T22:00:00.000000","2026-11-26T23:00:00.000000","2026-11-27T00:00:00.000000","2026-11-27T01:00:00.000000","2026-11-27T02:00:00.000000","2026-11-27T03:00:00.000000","2026-11-27T04:00:00.000000","2026-11-27T05:00:00.000000","2026-11-27T06:00:00.000000","2026-11-27T07:00:00.000000","2026-11-27T08:00:00.000000","2026-11-27T09:00:00.000000","2026-11-27T10:00:00.000000","2026-11-27T11:00:00.000000","2026-11-27T12:00:00.000000","2026-11-27T13:00:00.000000","2026-11-27T14:00:00.000000","2026-11-27T15:00:00.000000","2026-11-27T16:00:00.000000","2026-11-27T17:00:00.000000","2026-11-27T18:00:00.000000","2026-11-27T19:00:00.000000","2026-11-27T20:00:00.000000","2026-11-27T21:00:00.000000","2026-11-27T22:00:00.000000","2026-11-27T23:00:00.000000"],"y":{"dtype":"f8","bdata":"MzMzMzOzOUDNzMzMzEw5QDMzMzMzMzlAZmZmZmbmOEAzMzMzMzM5QAAAAAAAADlAAAAAAAAAOkAAAAAAAIA6QGZmZmZm5jpAzczMzMxMPEAzMzMzMzM8QGZmZmZmZj1AMzMzMzOzPUDNzMzMzEw+QAAAAAAAgD1AmpmZmZkZPkDNzMzMzEw9QM3MzMzMzD1AzczMzMxMPUCamZmZmZk8QJqZmZmZmTtAzczMzMxMO0DNzMzMzEw6QAAAAAAAgDlAZmZmZmbmOEAzMzMzM7M4QJqZmZmZGThAMzMzMzOzN0DNzMzMzEw4QDMzMzMzszhAAAAAAACAOEAzMzMzMzM5QDMzMzMzMzpAMzMzMzOzOkCamZmZmZk7QM3MzMzMzDtAmpmZmZmZPECamZmZmRk9QJqZmZmZGT1AZmZmZmbmPEAAAAAAAAA9QDMzMzMzMzxAmpmZmZkZPECamZmZmRk7QJqZmZmZmTpAZmZmZmbmOUDNzMzMzEw5QJqZmZmZGTlAZmZmZmbmN0AAAAAAAAA4QM3MzMzMzDdAMzMzMzMzOEBmZmZmZuY3QAAAAAAAADhAAAAAAAAAOUAAAAAAAAA5QAAAAAAAgDlAAAAAAACAOkDNzMzMzEw6QM3MzMzMTDtAAAAAAAAAO0BmZmZmZuY7QM3MzMzMTDxAAAAAAACAPEDNzMzMzEw8QDMzMzMzsztAmpmZmZkZO0BmZmZmZuY6QDMzMzMzMzpAAAAAAACAOUBmZmZmZuY5QDMzMzMzszhAzczMzMzMNkAzMzMzM7M3QGZmZmZm5jZAmpmZmZkZN0DNzMzMzMw3QGZmZmZm5jdAMzMzMzOzN0AAAAAAAIA4QAAAAAAAgDhAZmZmZmZmOUDNzMzMzMw5QDMzMzMzszpAAAAAAACAOkBmZmZmZuY6QDMzMzMzMztAAAAAAAAAO0BmZmZmZmY6QDMzMzMzMztAmpmZmZkZOkBmZmZmZuY4QGZmZmZmZjlAzczMzMxMOEDNzMzMzEw4QDMzMzMzMzdAMzMzMzOzOEDNzMzMzEw4QDMzMzMzszdAAAAAAAAAOEDNzMzMzMw3QDMzMzMzMzhAzczMzMzMOECamZmZmRk5QGZmZmZmZjlAmpmZmZkZOkCamZmZmRk7QDMzMzMzMztAMzMzMzOzO0AAAAAAAAA8QAAAAAAAgDtAMzMzMzMzPECamZmZmZk7QGZmZmZm5jtAmpmZmZkZO0AAAAAAAAA7QGZmZmZmZjpAmpmZmZmZOUAAAAAAAIA5QJqZmZmZGTlAmpmZmZmZOECamZmZmRk4QDMzMzMzszdAZmZmZmZmN0CamZmZmZk4QAAAAAAAgDhAAAAAAAAAOUAAAAAAAIA5QM3MzMzMzDpAMzMzMzMzO0CamZmZmRk8QDMzMzMzszxAAAAAAACAPUAAAAAAAAA+QAAAAAAAAD5AzczMzMzMPUAAAAAAAIA9QM3MzMzMTD1AmpmZmZmZPUDNzMzMzEw8QGZmZmZm5jpAzczMzMzMOkDNzMzMzEw6QGZmZmZmZjlAAAAAAACAOUAAAAAAAAA5QGZmZmZmZjhAmpmZmZkZOUBmZmZmZmY5QDMzMzMzMzlAMzMzMzMzOkDNzMzMzMw6QGZmZmZmZjtAAAAAAACAPEAAAAAAAIA9QJqZmZmZmT1AzczMzMzMPkAAAAAAAIA\u002fQAAAAAAAAD9AzczMzMxMP0CamZmZmZk+QJqZmZmZmT5AzczMzMzMPUBmZmZmZmY9QJqZmZmZGTxAZmZmZmbmO0BmZmZmZuY6QM3MzMzMzDlA"},"type":"scatter","xaxis":"x","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.94]},"yaxis":{"anchor":"x","domain":[0.0,1.0]},"yaxis2":{"anchor":"x","overlaying":"y","side":"right"},"title":{"text":"Chennai: 7-day hourly rain and temperature"},"margin":{"l":10,"r":10,"t":50,"b":10},"font":{"family":"Inter, sans-serif"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":420},                        {"displaylogo": false, "responsive": true}                    )                };            </script>        </div></section><section id="s3"><h2>Air quality</h2><p class="d">Background colours show US AQI categories.</p><div style="height:380px; width:100%;">                            <div id="94dd01ce-3c6b-4436-89dc-f52ac4b4592b" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("94dd01ce-3c6b-4436-89dc-f52ac4b4592b")) {                    Plotly.newPlot(                        "94dd01ce-3c6b-4436-89dc-f52ac4b4592b",                        [{"line":{"color":"#e2e8f0"},"x":["2026-11-21T00:00:00.000000","2026-11-21T01:00:00.000000","2026-11-21T02:00:00.000000","2026-11-21T03:00:00.000000","2026-11-21T04:00:00.000000","2026-11-21T05:00:00.000000","2026-11-21T06:00:00.000000","2026-11-21T07:00:00.000000","2026-11-21T08:00:00.000000","2026-11-21T09:00:00.000000","2026-11-21T10:00:00.000000","2026-11-21T11:00:00.000000","2026-11-21T12:00:00.000000","2026-11-21T13:00:00.000000","2026-11-21T14:00:00.000000","2026-11-21T15:00:00.000000","2026-11-21T16:00:00.000000","2026-11-21T17:00:00.000000","2026-11-21T18:00:00.000000","2026-11-21T19:00:00.000000","2026-11-21T20:00:00.000000","2026-11-21T21:00:00.000000","2026-11-21T22:00:00.000000","2026-11-21T23:00:00.000000","2026-11-22T00:00:00.000000","2026-11-22T01:00:00.000000","2026-11-22T02:00:00.000000","2026-11-22T03:00:00.000000","2026-11-22T04:00:00.000000","2026-11-22T05:00:00.000000","2026-11-22T06:00:00.000000","2026-11-22T07:00:00.000000","2026-11-22T08:00:00.000000","2026-11-22T09:00:00.000000","2026-11-22T10:00:00.000000","2026-11-22T11:00:00.000000","2026-11-22T12:00:00.000000","2026-11-22T13:00:00.000000","2026-11-22T14:00:00.000000","2026-11-22T15:00:00.000000","2026-11-22T16:00:00.000000","2026-11-22T17:00:00.000000","2026-11-22T18:00:00.000000","2026-11-22T19:00:00.000000","2026-11-22T20:00:00.000000","2026-11-22T21:00:00.000000","2026-11-22T22:00:00.000000","2026-11-22T23:00:00.000000","2026-11-23T00:00:00.000000","2026-11-23T01:00:00.000000","2026-11-23T02:00:00.000000","2026-11-23T03:00:00.000000","2026-11-23T04:00:00.000000","2026-11-23T05:00:00.000000","2026-11-23T06:00:00.000000","2026-11-23T07:00:00.000000","2026-11-23T08:00:00.000000","2026-11-23T09:00:00.000000","2026-11-23T10:00:00.000000","2026-11-23T11:00:00.000000","2026-11-23T12:00:00.000000","2026-11-23T13:00:00.000000","2026-11-23T14:00:00.000000","2026-11-23T15:00:00.000000","2026-11-23T16:00:00.000000","2026-11-23T17:00:00.000000","2026-11-23T18:00:00.000000","2026-11-23T19:00:00.000000","2026-11-23T20:00:00.000000","2026-11-23T21:00:00.000000","2026-11-23T22:00:00.000000","2026-11-23T23:00:00.000000","2026-11-24T00:00:00.000000","2026-11-24T01:00:00.000000","2026-11-24T02:00:00.000000","2026-11-24T03:00:00.000000","2026-11-24T04:00:00.000000","2026-11-24T05:00:00.000000","2026-11-24T06:00:00.000000","2026-11-24T07:00:00.000000","2026-11-24T08:00:00.000000","2026-11-24T09:00:00.000000","2026-11-24T10:00:00.000000","2026-11-24T11:00:00.000000","2026-11-24T12:00:00.000000","2026-11-24T13:00:00.000000","2026-11-24T14:00:00.000000","2026-11-24T15:00:00.000000","2026-11-24T16:00:00.000000","2026-11-24T17:00:00.000000","2026-11-24T18:00:00.000000","2026-11-24T19:00:00.000000","2026-11-24T20:00:00.000000","2026-11-24T21:00:00.000000","2026-11-24T22:00:00.000000","2026-11-24T23:00:00.000000","2026-11-25T00:00:00.000000","2026-11-25T01:00:00.000000","2026-11-25T02:00:00.000000","2026-11-25T03:00:00.000000","2026-11-25T04:00:00.000000","2026-11-25T05:00:00.000000","2026-11-25T06:00:00.000000","2026-11-25T07:00:00.000000","2026-11-25T08:00:00.000000","2026-11-25T09:00:00.000000","2026-11-25T10:00:00.000000","2026-11-25T11:00:00.000000","2026-11-25T12:00:00.000000","2026-11-25T13:00:00.000000","2026-11-25T14:00:00.000000","2026-11-25T15:00:00.000000","2026-11-25T16:00:00.000000","2026-11-25T17:00:00.000000","2026-11-25T18:00:00.000000","2026-11-25T19:00:00.000000","2026-11-25T20:00:00.000000","2026-11-25T21:00:00.000000","2026-11-25T22:00:00.000000","2026-11-25T23:00:00.000000","2026-11-26T00:00:00.000000","2026-11-26T01:00:00.000000","2026-11-26T02:00:00.000000","2026-11-26T03:00:00.000000","2026-11-26T04:00:00.000000","2026-11-26T05:00:00.000000","2026-11-26T06:00:00.000000","2026-11-26T07:00:00.000000","2026-11-26T08:00:00.000000","2026-11-26T09:00:00.000000","2026-11-26T10:00:00.000000","2026-11-26T11:00:00.000000","2026-11-26T12:00:00.000000","2026-11-26T13:00:00.000000","2026-11-26T14:00:00.000000","2026-11-26T15:00:00.000000","2026-11-26T16:00:00.000000","2026-11-26T17:00:00.000000","2026-11-26T18:00:00.000000","2026-11-26T19:00:00.000000","2026-11-26T20:00:00.000000","2026-11-26T21:00:00.000000","2026-11-26T22:00:00.000000","2026-11-26T23:00:00.000000","2026-11-27T00:00:00.000000","2026-11-27T01:00:00.000000","2026-11-27T02:00:00.000000","2026-11-27T03:00:00.000000","2026-11-27T04:00:00.000000","2026-11-27T05:00:00.000000","2026-11-27T06:00:00.000000","2026-11-27T07:00:00.000000","2026-11-27T08:00:00.000000","2026-11-27T09:00:00.000000","2026-11-27T10:00:00.000000","2026-11-27T11:00:00.000000","2026-11-27T12:00:00.000000","2026-11-27T13:00:00.000000","2026-11-27T14:00:00.000000","2026-11-27T15:00:00.000000","2026-11-27T16:00:00.000000","2026-11-27T17:00:00.000000","2026-11-27T18:00:00.000000","2026-11-27T19:00:00.000000","2026-11-27T20:00:00.000000","2026-11-27T21:00:00.000000","2026-11-27T22:00:00.000000","2026-11-27T23:00:00.000000"],"y":{"dtype":"i2","bdata":"HQEkASUBLgEsAUEBJAFDATYB4AD6AP4A4AD0AOIA3gDrAO4A9wD5APEALgExAUMBZAFwAYMBfgF5AXkBcgFpAYgBFwEmAR0BIgERAR4BIwExARUBLQEsASABZwFxAVoBigGHAX8BggGYAZMBpgGJAaYBKgEpAS4BIwFGAUsBQQEsAUABKgE6ASMBigGEAYYBQwFCAUMBXwFPATsBSQFBAV8BBgEQAfUA8wAGAQoBDgEEAQIB\u002fgARAfcAVQE+AWQBOQE4ATMBLAFGAVEBLgFTAVYB9QD5AAgB\u002fQDvAAkB7QABAQIBAAEBAeoAMQE8ATABEgEeARoBHQEUAQ4BFgEaAREBygDbAOIAyQDnANAA1QDMAOUA1ADjAMwAHgEPAQwB+QARAfsA+QAOAQIBEAETAQQBzADSAMoA0QDGANAA1ADbANwAyQDZANgA+gAZAfgA"},"type":"scatter"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"shapes":[{"fillcolor":"#22C55E","line":{"width":0},"opacity":0.15,"type":"rect","x0":0,"x1":1,"xref":"x domain","y0":0,"y1":50,"yref":"y"},{"fillcolor":"#EAB308","line":{"width":0},"opacity":0.15,"type":"rect","x0":0,"x1":1,"xref":"x domain","y0":50,"y1":100,"yref":"y"},{"fillcolor":"#F97316","line":{"width":0},"opacity":0.15,"type":"rect","x0":0,"x1":1,"xref":"x domain","y0":100,"y1":150,"yref":"y"},{"fillcolor":"#EF4444","line":{"width":0},"opacity":0.15,"type":"rect","x0":0,"x1":1,"xref":"x domain","y0":150,"y1":200,"yref":"y"},{"fillcolor":"#A855F7","line":{"width":0},"opacity":0.15,"type":"rect","x0":0,"x1":1,"xref":"x domain","y0":200,"y1":300,"yref":"y"},{"fillcolor":"#7F1D1D","line":{"width":0},"opacity":0.15,"type":"rect","x0":0,"x1":1,"xref":"x domain","y0":300,"y1":500,"yref":"y"}],"yaxis":{"range":[0,460]},"title":{"text":"Delhi: hourly AQI forecast"},"margin":{"l":10,"r":10,"t":50,"b":10},"font":{"family":"Inter, sans-serif"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":380},                        {"displaylogo": false, "responsive": true}                    )                };            </script>        </div></section><section id="s4"><h2>Alert rules</h2><p class="d">Configurable thresholds (data/alert_rules.json), IMD-style defaults.</p><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th>name</th>
+      <th>metric</th>
+      <th>operator</th>
+      <th>threshold</th>
+      <th>severity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Heat wave</td>
+      <td>temperature_2m_max</td>
+      <td>&gt;=</td>
+      <td>40.0</td>
+      <td>critical</td>
+    </tr>
+    <tr>
+      <td>Very hot day</td>
+      <td>temperature_2m_max</td>
+      <td>&gt;=</td>
+      <td>36.0</td>
+      <td>warning</td>
+    </tr>
+    <tr>
+      <td>Cold wave</td>
+      <td>temperature_2m_min</td>
+      <td>&lt;=</td>
+      <td>8.0</td>
+      <td>warning</td>
+    </tr>
+    <tr>
+      <td>Heavy rain</td>
+      <td>precipitation_sum</td>
+      <td>&gt;=</td>
+      <td>64.5</td>
+      <td>critical</td>
+    </tr>
+    <tr>
+      <td>Rain likely</td>
+      <td>precipitation_probability_max</td>
+      <td>&gt;=</td>
+      <td>70.0</td>
+      <td>info</td>
+    </tr>
+    <tr>
+      <td>Strong winds</td>
+      <td>wind_gusts_10m_max</td>
+      <td>&gt;=</td>
+      <td>50.0</td>
+      <td>warning</td>
+    </tr>
+    <tr>
+      <td>Very high UV</td>
+      <td>uv_index_max</td>
+      <td>&gt;=</td>
+      <td>8.0</td>
+      <td>info</td>
+    </tr>
+    <tr>
+      <td>Unhealthy air</td>
+      <td>us_aqi_max</td>
+      <td>&gt;=</td>
+      <td>151.0</td>
+      <td>warning</td>
+    </tr>
+    <tr>
+      <td>Hazardous air</td>
+      <td>us_aqi_max</td>
+      <td>&gt;=</td>
+      <td>301.0</td>
+      <td>critical</td>
+    </tr>
+    <tr>
+      <td>Dense fog</td>
+      <td>visibility_min</td>
+      <td>&lt;=</td>
+      <td>500.0</td>
+      <td>warning</td>
+    </tr>
+  </tbody>
+</table></section>
+<section><h2>Run the full app</h2><p class="d">This page is a static snapshot. The complete project (CLI, Streamlit dashboard, tests) runs locally:</p><code>pip install -r requirements.txt</code><code>python main.py forecast Chennai</code><code>python main.py alerts</code><code>streamlit run app.py</code></section>
+</div></main>
+<script>window.addEventListener("load",()=>document.querySelectorAll(".js-plotly-plot").forEach(p=>Plotly.Plots.resize(p)));</script>
+<footer>Built by Rohit Singh · generated 23 Nov 2026 by <code style="display:inline;padding:2px 6px">scripts/build_site.py</code> · <a style="color:var(--a)" href="https://github.com/rohitsingh83/Weather-Forecast-Alert-Application">github.com/rohitsingh83/Weather-Forecast-Alert-Application</a></footer>
+</body></html>

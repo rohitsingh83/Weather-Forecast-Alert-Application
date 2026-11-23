@@ -1,5 +1,7 @@
 # Weather Forecast & Alert Application
 
+🌐 **Live report:** https://rohitsingh83.github.io/Weather-Forecast-Alert-Application/ · 💻 **Source:** https://github.com/rohitsingh83/Weather-Forecast-Alert-Application
+
 A Python weather app that shows **current conditions, an hourly forecast, a 7-day forecast and air quality** for
 any city, and raises **early-warning alerts** for heat waves, cold waves, heavy rain, strong winds, dense fog,
 high UV and unhealthy air. Each alert explains what to do. Alerts can be **emailed automatically** on a
@@ -83,7 +85,7 @@ Weather-Forecast-Alert-Application/
 │   └── generate_sample_data.py
 ├── outputs/                  # active_alerts.csv, city_comparison.csv, sample alert email
 ├── images/                   # charts and dashboard screenshots
-├── docs/                     # project explanation, interview Q&A
+├── docs/                     # live report (index.html, GitHub Pages), project explanation, interview Q&A
 ├── tests/test_weather.py
 ├── main.py                   # command-line tool
 ├── app.py                    # Streamlit dashboard
